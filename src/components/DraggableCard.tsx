@@ -3,13 +3,14 @@ import React from "react";
 import styled from "styled-components";
 
 interface IDraggableCardProps {
-  toDo: string;
+  toDoId: number;
+  toDoText: string;
   index: number;
 }
 
-const DraggableCard = ({ toDo, index }: IDraggableCardProps) => {
+const DraggableCard = ({ toDoId, toDoText, index }: IDraggableCardProps) => {
   return (
-    <Draggable draggableId={toDo} index={index}>
+    <Draggable draggableId={`${toDoId}`} index={index}>
       {(provided, snapshot) => (
         <Card
           isDragging={snapshot.isDragging}
@@ -18,7 +19,7 @@ const DraggableCard = ({ toDo, index }: IDraggableCardProps) => {
           {...provided.dragHandleProps}
         >
           <span>🌟</span>
-          <p>{toDo}</p>
+          <p>{toDoText}</p>
         </Card>
       )}
     </Draggable>
@@ -28,7 +29,7 @@ const DraggableCard = ({ toDo, index }: IDraggableCardProps) => {
 const Card = styled.li<{ isDragging: boolean }>`
   display: flex;
   align-items: center;
-  min-height: 50px;
+  min-height: 40px;
   gap: 10px;
   margin-bottom: 10px;
   padding: 10px;

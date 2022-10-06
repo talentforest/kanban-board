@@ -1,18 +1,49 @@
 import { Droppable } from "react-beautiful-dnd";
+import { useForm } from "react-hook-form";
+import { useSetRecoilState } from "recoil";
 import styled from "styled-components";
+import { ITodo, toDoState } from "../data/atom";
 import DraggableCard from "./DraggableCard";
 
 interface IBoardProps {
-  toDos: string[];
+  toDos: ITodo[];
   boardId: string;
+}
+interface IForm {
+  toDo: string;
 }
 
 const Board = ({ toDos, boardId }: IBoardProps) => {
+  const setToDos = useSetRecoilState(toDoState);
+  const { register, setValue, handleSubmit } = useForm<IForm>();
+
+  const onValid = ({ toDo }: IForm) => {
+    const newToDo = {
+      id: Date.now(),
+      text: toDo,
+    };
+    setToDos((allBoards) => {
+      return {
+        ...allBoards,
+        [boardId]: [...allBoards[boardId], newToDo],
+      };
+    });
+    setValue("toDo", "");
+  };
+
   return (
-    <Droppable droppableId={boardId}>
-      {(provided, snapshot) => (
-        <BoardArea>
-          <Title>{boardId}</Title>
+    <BoardArea>
+      <Title>{boardId}</Title>
+      <Form onSubmit={handleSubmit(onValid)}>
+        <input
+          type="text"
+          {...register("toDo", { required: true })}
+          placeholder={`Add task ${boardId}`}
+        />
+        <button>click me</button>
+      </Form>
+      <Droppable droppableId={boardId}>
+        {(provided, snapshot) => (
           <List
             isDraggingOver={snapshot.isDraggingOver}
             isDraggingFromThis={Boolean(snapshot.draggingFromThisWith)}
@@ -20,13 +51,18 @@ const Board = ({ toDos, boardId }: IBoardProps) => {
             {...provided.droppableProps}
           >
             {toDos.map((toDo, index) => (
-              <DraggableCard key={toDo} toDo={toDo} index={index} />
+              <DraggableCard
+                key={toDo.id}
+                toDoId={toDo.id}
+                toDoText={toDo.text}
+                index={index}
+              />
             ))}
             {provided.placeholder}
           </List>
-        </BoardArea>
-      )}
-    </Droppable>
+        )}
+      </Droppable>
+    </BoardArea>
   );
 };
 
@@ -43,6 +79,27 @@ const BoardArea = styled.div`
   background-color: ${(props) => props.theme.boardColor};
   border-radius: 3px;
   padding-top: 15px;
+`;
+
+const Form = styled.form`
+  padding: 0 10px;
+  input {
+    width: 100%;
+    height: 30px;
+    margin-bottom: 5px;
+    padding: 4px;
+    &:focus {
+      outline: none;
+      border: 1px solid #ffd83b;
+    }
+  }
+  button {
+    width: 100%;
+    height: 25px;
+    border: 1px solid #a2a2a2;
+    background-color: #ffd83b;
+    border-radius: 3px;
+  }
 `;
 
 const Title = styled.h1`
