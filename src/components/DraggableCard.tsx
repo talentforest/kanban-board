@@ -10,8 +10,9 @@ interface IDraggableCardProps {
 const DraggableCard = ({ toDo, index }: IDraggableCardProps) => {
   return (
     <Draggable draggableId={toDo} index={index}>
-      {(provided) => (
+      {(provided, snapshot) => (
         <Card
+          isDragging={snapshot.isDragging}
           ref={provided.innerRef}
           {...provided.draggableProps}
           {...provided.dragHandleProps}
@@ -24,7 +25,7 @@ const DraggableCard = ({ toDo, index }: IDraggableCardProps) => {
   );
 };
 
-const Card = styled.li`
+const Card = styled.li<{ isDragging: boolean }>`
   display: flex;
   align-items: center;
   min-height: 50px;
@@ -32,7 +33,10 @@ const Card = styled.li`
   margin-bottom: 10px;
   padding: 10px;
   border-radius: 5px;
-  background-color: ${(props) => props.theme.cardColor};
+  background-color: ${(props) =>
+    props.isDragging ? "#a5ccff" : props.theme.cardColor};
+  box-shadow: ${(props) =>
+    props.isDragging ? "2px 0px 5px rgba(0, 0, 0, 0.3)" : "none"};
   span {
     font-size: 1.3rem;
     cursor: pointer;
